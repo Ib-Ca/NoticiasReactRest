@@ -36,6 +36,7 @@ class DetalleNoticia extends Component {
     const parsedData = JSON.parse(userData);
     const idUsuario = parsedData.id_usuario;
     if (idUsuario) {
+
         try {
             const response = await axios.post(`http://localhost:8000/noticias/${id}/comentarios/`, {
                 cuerpo: values.comentario,
@@ -86,9 +87,11 @@ class DetalleNoticia extends Component {
                 )}
             </Formik>
         {comentarios.map(comentario => (
-          <View key={comentario.id}>
+          <View key={comentario.id} >
             <Text style={styles.autor}>Autor: {comentario.autor_nombre}</Text>
-            <Text style={styles.comentario}>{comentario.cuerpo}</Text>
+            <View style={styles.contain}> 
+            <Text>{comentario.cuerpo}</Text>
+            </View>
           </View>
         ))}
       </View>
@@ -142,6 +145,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
   },
+  contain: {
+        width: 120,
+        flexGrow: 1,
+        flex: 1,
+    
+  }
 });
 
 export default DetalleNoticia;

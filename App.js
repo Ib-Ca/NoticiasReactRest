@@ -21,7 +21,7 @@ function PantallaInicio({navigation, route}){
   const verificarSesion = async () => {
     const userData = await AsyncStorage.getItem('userData');
     setIsLoggedIn(!!userData);
-    console.log("Datos almacenados en AsyncStorage:", userData);
+    //console.log("Datos almacenados en AsyncStorage:", userData);
     const { nombre_usuario } = JSON.parse(userData);
     setNombre(nombre_usuario)
   };
