@@ -1,94 +1,104 @@
-import React, {Component} from "react";
-import { StyleSheet, Text, View, Image, Pressable, FlatList, ScrollView } from 'react-native';
+import React, { Component } from "react";
+import { StyleSheet, Text, View, Pressable, ScrollView, TextInput } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 function NavegarPagina({ pagina, mensaje }) {
     const navigation = useNavigation();
   
     return (
         <Pressable style={styles.botones2} onPress={() => navigation.navigate(pagina)}>
-            <Text style={styles.textoboton} >{mensaje}</Text>
+            <Text style={styles.textoboton}>{mensaje}</Text>
         </Pressable>
     );
 }
 
-class Categorias extends Component{
-    state={
-        listaGrupos: [],
-        sinConexion: 0,
-    }
+class Login extends Component {
+    state = {
+        usuario: '',
+        clave: '',
+        error: ''
+    };
 
-    componentDidMount(){
-        axios.get("http://localhost:8000/listagrupos")
-        .then((response)=>{
-            this.setState({listaGrupos:response.data})
-        })
-        .catch(function(error){
-            this.setState({sinConexion:1});
-        })
-    }
+    iniciarSesion = () => {
+        const { usuario, clave } = this.state;
+        axios.post("http://localhost:8000/login/", { usuario, clave })
+            .then(async response => {
+                const data = response.data;
+                if (data.mensaje === 'Inicio de sesión exitoso') {
+                    await AsyncStorage.setItem("userData", JSON.stringify(data));
+                    this.props.navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'inicio' }],
+                    });
+                } else {
+                    this.setState({ error: 'Credenciales incorrectas' });
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                this.setState({ error: 'Ocurrió un error al iniciar sesión' });
+            });
+    };
 
-    render(){
-        return(
+    render() {
+        const { error } = this.state;
+        return (
             <View style={styles.container}>
-                <h3>Categorias de Noticias</h3>
-                <NavegarPagina pagina='ncategorias' mensaje='Nueva Categoria'/>
-                <ScrollView>
-                    <FlatList
-                        data={this.state.listaGrupos}
-                        keyExtractor={item => item.id}
-                        renderItem={({item})=> 
-                            <View style={styles.linea}>
-                                <Text style={styles.texto}>{item.grupo}</Text>
-                                <Pressable style={styles.botones}>
-                                    <Text style={styles.textoboton} >Editar</Text>
-                                </Pressable>
-                                <Pressable style={styles.botones}>
-                                    <Text style={styles.textoboton} >Borrar</Text>
-                                </Pressable>
-                            </View>
-                    }
-                    />
-                </ScrollView>
+                <Text style={styles.titulo}>Iniciar Sesión</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Usuario"
+                    onChangeText={text => this.setState({ usuario: text })}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Contraseña"
+                    secureTextEntry={true}
+                    onChangeText={text => this.setState({ clave: text })}
+                />
+                <Pressable style={styles.botones} onPress={this.iniciarSesion}>
+                    <Text style={styles.textoboton}>Iniciar Sesión</Text>
+                </Pressable>
+                {error ? <Text style={styles.error}>{error}</Text> : null}
+                <NavegarPagina pagina='registro' mensaje='Registrarse' />
             </View>
-        )
+        );
     }
 }
 
-export default Categorias;
+export default Login;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center',
-      },
-    linea: {
-      backgroundColor: '#fff',
-      alignItems: 'left',
-      justifyContent: 'left',
-      borderBottomColor: 'red',
-      borderBottomWidth: 2,
-      marginBottom: 10,
-      flexDirection: 'row',
     },
-    texto: {
-      fontSize: 20,
-      width:150,
+    titulo: {
+        fontSize: 24,
+        marginBottom: 20,
+        marginTop: 10,
+    },
+    input: {
+        height: 40,
+        width: '80%',
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginBottom: 10,
+        paddingHorizontal: 10,
     },
     botones: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 32,
-      marginTop: 5,
-      marginBottom: 5,
-      borderRadius: 4,
-      elevation: 3,
-      backgroundColor: 'black',
-      width:50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'justify',
+        paddingVertical: 12,
+        marginTop: 10,
+        marginBottom: 10,
+        borderRadius: 4,
+        elevation: 3,
+        backgroundColor: 'black',
+        width: 150,
     },
     botones2: {
         alignItems: 'center',
@@ -102,11 +112,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'blue',
     },
     textoboton: {
-      fontSize: 16,
-      lineHeight: 21,
-      fontWeight: 'bold',
-      letterSpacing: 0.25,
-      color: 'white',
+        fontSize: 16,
+        lineHeight: 21,
+        fontWeight: 'bold',
+        letterSpacing: 0.25,
+        color: 'white',
     },
-  });
-  
+    error: {
+        color: 'red',
+        marginTop: 10,
+    },
+});
