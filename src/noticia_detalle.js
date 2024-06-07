@@ -34,9 +34,8 @@ class DetalleNoticia extends Component {
     const { id } = this.props.route.params;
     const userData = await AsyncStorage.getItem('userData');
     const parsedData = JSON.parse(userData);
-    const idUsuario = parsedData.id_usuario;
-    if (idUsuario) {
-
+    if (parsedData && parsedData.id_usuario) {
+        const idUsuario = parsedData.id_usuario;
         try {
             const response = await axios.post(`http://localhost:8000/noticias/${id}/comentarios/`, {
                 cuerpo: values.comentario,
@@ -49,9 +48,10 @@ class DetalleNoticia extends Component {
             console.error('Error al enviar el comentario:', error);
         }
     } else {
-        console.error('No se encontraron datos de usuario en AsyncStorage');
+      this.setState({ sinConexion: 1 });
     }
 };
+
 
   render() {
     const { noticia, sinConexion, comentarios } = this.state;

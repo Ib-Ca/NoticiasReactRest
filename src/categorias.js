@@ -61,7 +61,7 @@ class Login extends Component {
                     <Text style={styles.textoboton}>Iniciar Sesión</Text>
                 </Pressable>
                 {error ? <Text style={styles.error}>{error}</Text> : null}
-                <NavegarPagina pagina='registro' mensaje='Registrarse' />
+                <NavegarPagina pagina='Registrarse' mensaje='Registrarse'/>
             </View>
         );
     }

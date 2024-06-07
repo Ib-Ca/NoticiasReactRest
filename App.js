@@ -3,7 +3,7 @@ import React, { useState,useEffect } from 'react';
 import { StyleSheet, Text, View, Image, Pressable } from 'react-native';
 import ListaPost from './src/lista_post';
 import Login from './src/categorias';
-import CategoriaForm from './src/categoriaForm';
+import Registrarse from './src/categoriaForm';
 import DetalleNoticia from './src/noticia_detalle';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -49,14 +49,6 @@ function PantallaInicio({navigation, route}){
     </View>
   );
 }
-const cerrarSesion = async () => {
-  try {
-    await AsyncStorage.removeItem("userData");
-    navigation.navigate('login');
-  } catch (error) {
-    console.error('Error al cerrar sesión:', error);
-  }
-};
 
 const Stack=createNativeStackNavigator();
 
@@ -66,8 +58,8 @@ export default function App() {
       <Stack.Navigator screenOptions={{ title: 'Noticias KingWinWin'}}>
         <Stack.Screen name="inicio" component={PantallaInicio} options={{title: "Noticias KingWinWin"}}/>
         <Stack.Screen name="login" component={Login}/>
-        <Stack.Screen name="ncategorias" component={CategoriaForm}/>
         <Stack.Screen name="DetalleNoticia" component={DetalleNoticia} />
+        <Stack.Screen name="Registrarse" component={Registrarse} />
       </Stack.Navigator>
     </NavigationContainer>
   );
